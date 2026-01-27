@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: launcher-loader
+    env: static
+    buildCommand: ""
+    staticPublishPath: "/"
