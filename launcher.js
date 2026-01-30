@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-/* ⭐ BROWSER — EXACT SAME SYSTEM AS YOUTUBE ⭐ */
+/* ⭐ BROWSER — POPUP-ONLY MODE (CHROMEBOOK SAFE) ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let q = wu.value.trim();
   if (!q) return;
@@ -301,30 +301,29 @@ d.getElementById("webBtn").onclick = () => {
                 q.startsWith("https://") ||
                 (q.includes(".") && !q.includes(" "));
 
-  /* If not a URL → turn into Google search */
+  /* If not a URL → Google search */
   if (!isURL) {
     q = "https://www.google.com/search?q=" + encodeURIComponent(q);
   } else if (!q.startsWith("http")) {
     q = "https://" + q;
   }
 
-  /* ⭐ Open disguised blank popup IMMEDIATELY (same as YouTube) ⭐ */
+  /* ⭐ Open blank popup IMMEDIATELY ⭐ */
   const popup = window.open("about:blank", "_blank");
   if (popup) popup.document.title = "";
 
-  /* 1️⃣ Try loading inside iframe */
-  wf.src = q;
+  /* ⭐ Load ONLY in popup — iframe is ignored ⭐ */
+  if (popup && popup.location) {
+    popup.location.href = q;
+  }
 
-  /* 2️⃣ Final fallback — load into popup (same as YouTube) */
-  setTimeout(() => {
-    if (popup && popup.location) {
-      popup.location.href = q;
-    }
-  }, 1200);
+  /* Clear iframe so it doesn't show errors */
+  wf.src = "about:blank";
 };
 
 
 })();
+
 
 
 
