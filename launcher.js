@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-/* ⭐ BROWSER — POPUP-ONLY MODE (NO PROXIES, CHROMEBOOK SAFE) ⭐ */
+/* ⭐ BROWSER — EXACT SAME SYSTEM AS YOUTUBE (POPUP-ONLY, NO PIPED) ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let q = wu.value.trim();
   if (!q) return;
@@ -308,11 +308,11 @@ d.getElementById("webBtn").onclick = () => {
     q = "https://" + q;
   }
 
-  /* ⭐ Open blank popup IMMEDIATELY ⭐ */
+  /* ⭐ Open disguised blank popup IMMEDIATELY (same as YouTube) ⭐ */
   const popup = window.open("about:blank", "_blank");
   if (popup) popup.document.title = "";
 
-  /* ⭐ Load ONLY in popup — iframe is ignored ⭐ */
+  /* ⭐ Load ONLY in popup — iframe is ignored (Chromebook-safe) ⭐ */
   if (popup && popup.location) {
     popup.location.href = q;
   }
