@@ -17,15 +17,23 @@
     overflow:hidden;z-index:999999;
     box-shadow:0 0 25px rgba(199,167,255,.35);
     animation:fadeIn .35s ease-out forwards;
+    cursor:grab;
   }
-  @keyframes fadeIn{from{opacity:0;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  #panel:active{cursor:grabbing}
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translate(-50%,-50%) scale(.85)}
+    to{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  }
+
   #head{
     background:rgba(0,0,0,.25);padding:12px;
     font-weight:600;display:flex;
     justify-content:space-between;align-items:center;
-    cursor:move;user-select:none;
+    user-select:none;
     border-bottom:1px solid rgba(255,255,255,.08);
   }
+
   #tabs{display:flex;background:rgba(0,0,0,.2)}
   #tabs button{
     flex:1;padding:10px;background:transparent;
@@ -40,12 +48,17 @@
     border-bottom:2px solid #ff9ce6;
     box-shadow:0 0 8px rgba(255,156,230,.25);
   }
+
   .tab{
     flex:1;display:none;flex-direction:column;
     padding:12px;animation:slideIn .25s ease-out;
   }
-  @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+  }
   .tab.active{display:flex}
+
   select,input,button.action{
     padding:10px;border-radius:10px;
     border:1px solid rgba(255,156,230,.25);
@@ -58,10 +71,12 @@
     border-color:#ff9ce6;transform:scale(1.03);
     box-shadow:0 0 10px rgba(255,156,230,.25);
   }
+
   iframe{
     flex:1;border:none;background:#000;
     border-radius:10px;margin-top:10px;
   }
+
   #resizeHandle{
     position:absolute;width:16px;height:16px;
     bottom:6px;right:6px;border-radius:50%;
@@ -144,35 +159,70 @@
     };
   });
 
-  /* DRAG + RESIZE PHYSICS */
-  let dragging=false,resizing=false,x,y,w,h,targetX,targetY,targetW,targetH,dragOX,dragOY,rsX,rsY,startW,startH;
-  const head=d.getElementById("head"),rh=d.getElementById("resizeHandle"),r=p.getBoundingClientRect();
-  x=targetX=r.left;y=targetY=r.top;w=targetW=r.width;h=targetH=r.height;
-  p.style.left=x+"px";p.style.top=y+"px";p.style.width=w+"px";p.style.height=h+"px";
+  /* ⭐ DRAG ANYWHERE + RESIZE ⭐ */
+  let dragging=false,resizing=false,x,y,w,h,targetX,targetY,targetW,targetH;
+  let dragOX,dragOY,rsX,rsY,startW,startH;
 
-  head.onmousedown=e=>{dragging=true;dragOX=e.clientX-x;dragOY=e.clientY-y};
-  rh.onmousedown=e=>{e.stopPropagation();resizing=true;rsX=e.clientX;rsY=e.clientY;startW=w;startH=h};
+  const rh = d.getElementById("resizeHandle");
+  const r = p.getBoundingClientRect();
 
-  d.onmousemove=e=>{
-    if(dragging){targetX=e.clientX-dragOX;targetY=e.clientY-dragOY}
-    if(resizing){
-      targetW=Math.max(260,startW+(e.clientX-rsX));
-      targetH=Math.max(260,startH+(e.clientY-rsY));
+  x = targetX = r.left;
+  y = targetY = r.top;
+  w = targetW = r.width;
+  h = targetH = r.height;
+
+  p.style.left = x+"px";
+  p.style.top = y+"px";
+  p.style.width = w+"px";
+  p.style.height = h+"px";
+
+  /* DRAG FROM ANYWHERE */
+  p.onmousedown = e => {
+    if (e.target === rh) return;
+    dragging = true;
+    dragOX = e.clientX - x;
+    dragOY = e.clientY - y;
+  };
+
+  /* RESIZE HANDLE */
+  rh.onmousedown = e => {
+    e.stopPropagation();
+    resizing = true;
+    rsX = e.clientX;
+    rsY = e.clientY;
+    startW = w;
+    startH = h;
+  };
+
+  d.onmousemove = e => {
+    if (dragging){
+      targetX = e.clientX - dragOX;
+      targetY = e.clientY - dragOY;
+    }
+    if (resizing){
+      targetW = Math.max(260, startW + (e.clientX - rsX));
+      targetH = Math.max(260, startH + (e.clientY - rsY));
     }
   };
 
-  d.onmouseup=()=>{dragging=false;resizing=false};
+  d.onmouseup = () => {
+    dragging = false;
+    resizing = false;
+  };
 
+  /* SMOOTH ANIMATION */
   (function anim(){
-    const ease=.2;
-    x+=(targetX-x)*ease;
-    y+=(targetY-y)*ease;
-    w+=(targetW-w)*ease;
-    h+=(targetH-h)*ease;
-    p.style.left=x+"px";
-    p.style.top=y+"px";
-    p.style.width=w+"px";
-    p.style.height=h+"px";
+    const ease = .2;
+    x += (targetX - x) * ease;
+    y += (targetY - y) * ease;
+    w += (targetW - w) * ease;
+    h += (targetH - h) * ease;
+
+    p.style.left = x+"px";
+    p.style.top = y+"px";
+    p.style.width = w+"px";
+    p.style.height = h+"px";
+
     requestAnimationFrame(anim);
   })();
 
