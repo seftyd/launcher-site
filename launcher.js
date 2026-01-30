@@ -159,7 +159,7 @@
     };
   });
 
-  /* ⭐ DRAG ANYWHERE + RESIZE ⭐ */
+  /* DRAG + RESIZE */
   let dragging=false,resizing=false,x,y,w,h,targetX,targetY,targetW,targetH;
   let dragOX,dragOY,rsX,rsY,startW,startH;
 
@@ -176,7 +176,6 @@
   p.style.width = w+"px";
   p.style.height = h+"px";
 
-  /* DRAG FROM ANYWHERE */
   p.onmousedown = e => {
     if (e.target === rh) return;
     dragging = true;
@@ -184,7 +183,6 @@
     dragOY = e.clientY - y;
   };
 
-  /* RESIZE HANDLE */
   rh.onmousedown = e => {
     e.stopPropagation();
     resizing = true;
@@ -210,7 +208,6 @@
     resizing = false;
   };
 
-  /* SMOOTH ANIMATION */
   (function anim(){
     const ease = .2;
     x += (targetX - x) * ease;
@@ -226,7 +223,7 @@
     requestAnimationFrame(anim);
   })();
 
-  /* GAME LOGIC */
+  /* ELEMENTS */
   const gs=d.getElementById("gameSelect"),
         gf=d.getElementById("gameFrame"),
         ys=d.getElementById("ytSearch"),
@@ -234,94 +231,66 @@
         wu=d.getElementById("webUrl"),
         wf=d.getElementById("webFrame");
 
+  /* GAMES */
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-  /* ⭐ SUPER YOUTUBE LOADER — ALL FALLBACKS + INSTANT POPUP ⭐ */
+  /* ⭐ YOUTUBE LOADER ⭐ */
   d.getElementById("ytBtn").onclick = () => {
     const q = ys.value.trim();
     if (!q) return;
 
     let id = "";
 
-    // Extract video ID
     if (q.includes("youtube.com") || q.includes("youtu.be")) {
       id = q.split("v=")[1] || q.split("/").pop();
       id = id.split("&")[0];
     } else {
-      // Search mode → use Piped search
-      yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
+      yf.src = "https://www.google.com/search?q=" + encodeURIComponent(q);
       return;
     }
 
-    /* ⭐ Open disguised blank popup IMMEDIATELY ⭐ */
     const popup = window.open("about:blank", "_blank");
-    if (popup) {
-      popup.document.title = "";
-    }
+    if (popup) popup.document.title = "";
 
-    /* 1️⃣ Try YouTube embed */
     yf.src = "https://www.youtube.com/embed/" + id;
 
-    /* 2️⃣ Try Invidious embed */
-    setTimeout(() => {
-      if (yf.contentWindow == null) {
-        yf.src = "https://inv.nadeko.net/embed/" + id;
-      }
-    }, 800);
-
-    /* 3️⃣ Try Piped embed */
-    setTimeout(() => {
-      if (yf.contentWindow == null) {
-        yf.src = "https://piped.video/embed/" + id;
-      }
-    }, 1600);
-
-    /* 4️⃣ Try full proxied page */
-    setTimeout(() => {
-      if (yf.contentWindow == null) {
-        yf.src = "https://piped.video/watch?v=" + id;
-      }
-    }, 2400);
-
-    /* 5️⃣ Final fallback — load video into the popup */
     setTimeout(() => {
       if (popup && popup.location) {
-        popup.location.href = "https://piped.video/watch?v=" + id;
+        popup.location.href = "https://www.youtube.com/watch?v=" + id;
       }
-    }, 3000);
+    }, 1200);
   };
 
-/* ⭐ BROWSER — POPUP-ONLY + LOADS IN YOUTUBE PANEL (NO PIPED) ⭐ */
-d.getElementById("webBtn").onclick = () => {
-  let q = wu.value.trim();
-  if (!q) return;
+  /* ⭐ BROWSER — PANEL FIRST + POPUP SECOND ⭐ */
+  d.getElementById("webBtn").onclick = () => {
+    let q = wu.value.trim();
+    if (!q) return;
 
-  /* Detect if input is a real URL */
-  const isURL = q.startsWith("http://") ||
-                q.startsWith("https://") ||
-                (q.includes(".") && !q.includes(" "));
+    const isURL = q.startsWith("http://") ||
+                  q.startsWith("https://") ||
+                  (q.includes(".") && !q.includes(" "));
 
-  /* If not a URL → Google search */
-  if (!isURL) {
-    q = "https://www.google.com/search?q=" + encodeURIComponent(q);
-  } else if (!q.startsWith("http")) {
-    q = "https://" + q;
-  }
+    if (!isURL) {
+      q = "https://www.google.com/search?q=" + encodeURIComponent(q);
+    } else if (!q.startsWith("http")) {
+      q = "https://" + q;
+    }
 
-  /* ⭐ Open disguised blank popup IMMEDIATELY (same as YouTube) ⭐ */
-  const popup = window.open("about:blank", "_blank");
-  if (popup) popup.document.title = "";
+    /* Load into YouTube panel */
+    yf.src = q;
 
-  /* ⭐ Load into the YouTube panel (same place your video loads) ⭐ */
-  yf.src = q;
+    /* Clear browser iframe */
+    wf.src = "about:blank";
 
-  /* ⭐ Also load ONLY in popup — iframe fallback identical to YouTube ⭐ */
-  if (popup && popup.location) {
-    popup.location.href = q;
-  }
+    /* Popup identical to YouTube */
+    const popup = window.open("about:blank", "_blank");
+    if (popup) popup.document.title = "";
 
-  /* Clear the browser iframe so it doesn't show errors */
-  wf.src = "about:blank";
-};
+    setTimeout(() => {
+      if (popup && popup.location) {
+        popup.location.href = q;
+      }
+    }, 1200);
+  };
 
 })();
