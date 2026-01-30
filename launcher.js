@@ -291,19 +291,36 @@
     }, 3000);
   };
 
-  /* SMART BROWSER */
-  d.getElementById("webBtn").onclick=()=>{
-    let u=wu.value.trim();
-    if(!u)return;
-    if(!u.startsWith("http")) u="https://"+u;
+  /* ⭐ SMART BROWSER WITH PIPED SEARCH + INSTANT POPUP ⭐ */
+  d.getElementById("webBtn").onclick = () => {
+    let q = wu.value.trim();
+    if (!q) return;
 
-    wf.src=u;
+    /* Detect if input is a real URL */
+    const isURL = q.startsWith("http://") ||
+                  q.startsWith("https://") ||
+                  (q.includes(".") && !q.includes(" "));
 
-    setTimeout(()=>{
-      if(wf.contentWindow === null){
-        window.open(u,"_blank");
+    /* If not a URL → treat as search */
+    if (!isURL) {
+      q = "https://piped.video/search?q=" + encodeURIComponent(q);
+    } else if (!q.startsWith("http")) {
+      q = "https://" + q;
+    }
+
+    /* ⭐ Open blank popup IMMEDIATELY ⭐ */
+    const popup = window.open("about:blank", "_blank");
+    if (popup) popup.document.title = "";
+
+    /* Try loading inside iframe */
+    wf.src = q;
+
+    /* If iframe is blocked → load into popup */
+    setTimeout(() => {
+      if (popup && popup.location) {
+        popup.location.href = q;
       }
-    },800);
+    }, 800);
   };
 
 })();
