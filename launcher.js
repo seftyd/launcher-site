@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-/* ⭐ SMART BROWSER WITH GOOGLE SEARCH + INSTANT POPUP ⭐ */
+/* ⭐ SMART BROWSER WITH PIPED SEARCH + INSTANT POPUP ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let q = wu.value.trim();
   if (!q) return;
@@ -301,9 +301,9 @@ d.getElementById("webBtn").onclick = () => {
                 q.startsWith("https://") ||
                 (q.includes(".") && !q.includes(" "));
 
-  /* If not a URL → treat as Google search */
+  /* If not a URL → treat as search */
   if (!isURL) {
-    q = "https://www.google.com/search?q=" + encodeURIComponent(q);
+    q = "https://piped.video/search?q=" + encodeURIComponent(q);
   } else if (!q.startsWith("http")) {
     q = "https://" + q;
   }
@@ -315,7 +315,7 @@ d.getElementById("webBtn").onclick = () => {
   /* Try loading inside iframe */
   wf.src = q;
 
-  /* Also load into popup (bypasses iframe blocks) */
+  /* If iframe is blocked → load into popup */
   setTimeout(() => {
     if (popup && popup.location) {
       popup.location.href = q;
@@ -324,4 +324,5 @@ d.getElementById("webBtn").onclick = () => {
 };
 
 })();
+
 
