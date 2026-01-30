@@ -236,23 +236,25 @@
 
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-  /* ⭐ FIXED YOUTUBE (NO ERROR 153) ⭐ */
-  d.getElementById("ytBtn").onclick = () => {
-    const q = ys.value.trim();
-    if (!q) return;
+/* ULTRA‑FIXED YOUTUBE (BYPASSES ERROR 153) */
+d.getElementById("ytBtn").onclick = () => {
+  const q = ys.value.trim();
+  if (!q) return;
 
-    let id = "";
+  let id = "";
 
-    if (q.includes("youtube.com") || q.includes("youtu.be")) {
-      id = q.split("v=")[1] || q.split("/").pop();
-      id = id.split("&")[0];
-    } else {
-      yf.src = "https://inv.nadeko.net/search?q=" + encodeURIComponent(q);
-      return;
-    }
+  if (q.includes("youtube.com") || q.includes("youtu.be")) {
+    id = q.split("v=")[1] || q.split("/").pop();
+    id = id.split("&")[0];
+  } else {
+    // Search → use proxy search
+    yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
+    return;
+  }
 
-    yf.src = "https://inv.nadeko.net/embed/" + id;
-  };
+  // Load through Piped proxy (works even when embeds are blocked)
+  yf.src = "https://piped.video/embed/" + id;
+};
 
   /* SMART BROWSER */
   d.getElementById("webBtn").onclick=()=>{
@@ -270,3 +272,4 @@
   };
 
 })();
+
