@@ -236,24 +236,39 @@
 
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-/* ULTRA‑FIXED YOUTUBE (BYPASSES ERROR 153) */
+/* SUPER YOUTUBE LOADER — 3‑IN‑1 AUTO FALLBACK */
 d.getElementById("ytBtn").onclick = () => {
   const q = ys.value.trim();
   if (!q) return;
 
   let id = "";
 
+  // Extract video ID
   if (q.includes("youtube.com") || q.includes("youtu.be")) {
     id = q.split("v=")[1] || q.split("/").pop();
     id = id.split("&")[0];
   } else {
-    // Search → use proxy search
+    // Search mode → use Piped search (works everywhere)
     yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
     return;
   }
 
-  // Load through Piped proxy (works even when embeds are blocked)
-  yf.src = "https://piped.video/embed/" + id;
+  /* 1️⃣ Try YouTube embed first */
+  yf.src = "https://www.youtube.com/embed/" + id;
+
+  /* 2️⃣ If YouTube fails → try Invidious */
+  setTimeout(() => {
+    if (yf.contentWindow == null || yf.contentDocument?.body?.innerText?.includes("Error")) {
+      yf.src = "https://inv.nadeko.net/embed/" + id;
+    }
+  }, 800);
+
+  /* 3️⃣ If Invidious fails → try Piped */
+  setTimeout(() => {
+    if (yf.contentWindow == null || yf.contentDocument?.body?.innerText?.includes("Error")) {
+      yf.src = "https://piped.video/embed/" + id;
+    }
+  }, 1600);
 };
 
   /* SMART BROWSER */
@@ -272,4 +287,5 @@ d.getElementById("ytBtn").onclick = () => {
   };
 
 })();
+
 
