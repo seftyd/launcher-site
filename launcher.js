@@ -88,25 +88,13 @@
     border-radius:10px;margin-top:6px;
   }
 
-  /* drag from edges */
-  #panelEdgeTop,
-  #panelEdgeBottom,
-  #panelEdgeLeft,
-  #panelEdgeRight{
-    position:absolute;z-index:${zCounter + 1};
+  #resizeHandle{
+    position:absolute;width:16px;height:16px;
+    bottom:6px;right:6px;border-radius:50%;
+    background:#ff9ce6;opacity:.7;
+    cursor:se-resize;
+    box-shadow:0 0 10px rgba(255,156,230,.4);
   }
-  #panelEdgeTop,
-  #panelEdgeBottom{
-    left:0;right:0;height:10px;cursor:grab;
-  }
-  #panelEdgeTop{top:0;}
-  #panelEdgeBottom{bottom:0;}
-  #panelEdgeLeft,
-  #panelEdgeRight{
-    top:0;bottom:0;width:10px;cursor:grab;
-  }
-  #panelEdgeLeft{left:0;}
-  #panelEdgeRight{right:0;}
   `;
   d.head.appendChild(s);
 
@@ -129,24 +117,24 @@
       <select id="gameSelect">
         <option value="">— Select a game —</option>
 
-        <option value="https://1v1.lol" data-reliability="red">🔴 1v1.lol</option>
-        <option value="https://tetris-js.onrender.com" data-reliability="green">🟢 Tetris</option>
-        <option value="https://cookieclickerclone.onrender.com" data-reliability="green">🟢 Cookie Clicker</option>
-        <option value="https://flappybirdclone.onrender.com" data-reliability="green">🟢 Flappy Bird</option>
-        <option value="https://play2048.onrender.com" data-reliability="green">🟢 2048</option>
-        <option value="https://snakegamejs.onrender.com" data-reliability="green">🟢 Snake</option>
+        <option value="https://1v1.lol">1v1.lol</option>
+        <option value="https://tetris-js.onrender.com">Tetris</option>
+        <option value="https://cookieclickerclone.onrender.com">Cookie Clicker</option>
+        <option value="https://flappybirdclone.onrender.com">Flappy Bird</option>
+        <option value="https://play2048.onrender.com">2048</option>
+        <option value="https://snakegamejs.onrender.com">Snake</option>
 
-        <option value="https://browserfps.com/krunker" data-reliability="red">🔴 Krunker</option>
-        <option value="https://paper-io.com" data-reliability="red">🔴 Paper.io</option>
-        <option value="https://shellshockers.io" data-reliability="red">🔴 Shell Shockers</option>
-        <option value="https://motox3m.co" data-reliability="yellow">🟡 Moto X3M</option>
-        <option value="https://drift-hunters.co" data-reliability="red">🔴 Drift Hunters</option>
+        <option value="https://browserfps.com/krunker">Krunker</option>
+        <option value="https://paper-io.com">Paper.io</option>
+        <option value="https://shellshockers.io">Shell Shockers</option>
+        <option value="https://motox3m.co">Moto X3M</option>
+        <option value="https://drift-hunters.co">Drift Hunters</option>
 
-        <option value="https://slopegame.onrender.com" data-reliability="green">🟢 Slope</option>
-        <option value="https://run3game.onrender.com" data-reliability="green">🟢 Run 3</option>
+        <option value="https://slopegame.onrender.com">Slope</option>
+        <option value="https://run3game.onrender.com">Run 3</option>
 
-        <option value="https://crossyroad.co" data-reliability="red">🔴 Crossy Road</option>
-        <option value="https://geometrydashlite.onrender.com" data-reliability="yellow">🟡 Geometry Dash</option>
+        <option value="https://crossyroad.co">Crossy Road</option>
+        <option value="https://geometrydashlite.onrender.com">Geometry Dash</option>
       </select>
 
       <button class="action" id="playGame">Play</button>
@@ -165,10 +153,7 @@
       <iframe id="webFrame"></iframe>
     </div>
 
-    <div id="panelEdgeTop"></div>
-    <div id="panelEdgeBottom"></div>
-    <div id="panelEdgeLeft"></div>
-    <div id="panelEdgeRight"></div>
+    <div id="resizeHandle"></div>
   `;
   d.body.appendChild(p);
 
@@ -194,7 +179,7 @@
     };
   });
 
-  /* DRAGGING FROM EDGES + HEADER ONLY */
+  /* DRAGGING */
   let dragging = false;
   let startX = 0, startY = 0;
   let panelX = window.innerWidth / 2 - 190;
@@ -206,19 +191,12 @@
   };
   setPanelPos();
 
-  const startDrag = e => {
+  d.getElementById("head").addEventListener("mousedown", e => {
     dragging = true;
     bringToFront(p);
     startX = e.clientX - panelX;
     startY = e.clientY - panelY;
-    e.preventDefault();
-  };
-
-  d.getElementById("head").addEventListener("mousedown", startDrag);
-  d.getElementById("panelEdgeTop").addEventListener("mousedown", startDrag);
-  d.getElementById("panelEdgeBottom").addEventListener("mousedown", startDrag);
-  d.getElementById("panelEdgeLeft").addEventListener("mousedown", startDrag);
-  d.getElementById("panelEdgeRight").addEventListener("mousedown", startDrag);
+  });
 
   d.addEventListener("mousemove", e => {
     if (!dragging) return;
@@ -227,9 +205,33 @@
     setPanelPos();
   });
 
-  d.addEventListener("mouseup", () => {
-    dragging = false;
-  });
+  d.addEventListener("mouseup", () => dragging = false);
+
+  /* RESIZING */
+  const rh = d.getElementById("resizeHandle");
+  let resizing = false;
+  let startW, startH, rsX, rsY;
+
+  rh.onmousedown = e => {
+    resizing = true;
+    bringToFront(p);
+    const rect = p.getBoundingClientRect();
+    startW = rect.width;
+    startH = rect.height;
+    rsX = e.clientX;
+    rsY = e.clientY;
+    e.preventDefault();
+  };
+
+  d.onmousemove = e => {
+    if (!resizing) return;
+    const newW = Math.max(260, startW + (e.clientX - rsX));
+    const newH = Math.max(260, startH + (e.clientY - rsY));
+    p.style.width = newW + "px";
+    p.style.height = newH + "px";
+  };
+
+  d.onmouseup = () => resizing = false;
 
   /* ELEMENTS */
   const gs = d.getElementById("gameSelect"),
@@ -239,33 +241,15 @@
         wu = d.getElementById("webUrl"),
         wf = d.getElementById("webFrame");
 
-  /* ⭐ GAMES — AUTO-DETECT RELIABILITY ⭐ */
+  /* GAMES — PANEL + POPUP */
   d.getElementById("playGame").onclick = () => {
-    const option = gs.selectedOptions[0];
-    if (!option) return;
+    const url = gs.value;
+    if (!url) return;
 
-    const url = option.value;
-    const reliability = option.dataset.reliability;
-
-    /* RED = popup only */
-    if (reliability === "red") {
-      const popup = window.open("about:blank", "_blank");
-      if (popup) popup.location.href = url;
-      gf.src = "about:blank";
-      return;
-    }
-
-    /* GREEN or YELLOW = try panel + popup fallback */
     gf.src = url;
 
     const popup = window.open("about:blank", "_blank");
-    if (popup) popup.document.title = "";
-
-    setTimeout(() => {
-      if (popup && popup.location) {
-        popup.location.href = url;
-      }
-    }, 800);
+    if (popup) popup.location.href = url;
   };
 
   /* YOUTUBE */
@@ -291,7 +275,7 @@
       if (popup && popup.location) {
         popup.location.href = "https://www.youtube.com/watch?v=" + id;
       }
-    }, 1200);
+    }, 800);
   };
 
   /* BROWSER — POPUP ONLY */
@@ -313,12 +297,6 @@
     wf.src = "about:blank";
 
     const popup = window.open("about:blank", "_blank");
-    if (popup) popup.document.title = "";
-
-    setTimeout(() => {
-      if (popup && popup.location) {
-        popup.location.href = q;
-      }
-    }, 200);
+    if (popup) popup.location.href = q;
   };
 })();
