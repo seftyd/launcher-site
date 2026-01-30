@@ -236,40 +236,56 @@
 
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-/* SUPER YOUTUBE LOADER — 3‑IN‑1 AUTO FALLBACK */
-d.getElementById("ytBtn").onclick = () => {
-  const q = ys.value.trim();
-  if (!q) return;
+  /* ⭐ SUPER YOUTUBE LOADER — ALL FALLBACKS ⭐ */
+  d.getElementById("ytBtn").onclick = () => {
+    const q = ys.value.trim();
+    if (!q) return;
 
-  let id = "";
+    let id = "";
 
-  // Extract video ID
-  if (q.includes("youtube.com") || q.includes("youtu.be")) {
-    id = q.split("v=")[1] || q.split("/").pop();
-    id = id.split("&")[0];
-  } else {
-    // Search mode → use Piped search (works everywhere)
-    yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
-    return;
-  }
-
-  /* 1️⃣ Try YouTube embed first */
-  yf.src = "https://www.youtube.com/embed/" + id;
-
-  /* 2️⃣ If YouTube fails → try Invidious */
-  setTimeout(() => {
-    if (yf.contentWindow == null || yf.contentDocument?.body?.innerText?.includes("Error")) {
-      yf.src = "https://inv.nadeko.net/embed/" + id;
+    if (q.includes("youtube.com") || q.includes("youtu.be")) {
+      id = q.split("v=")[1] || q.split("/").pop();
+      id = id.split("&")[0];
+    } else {
+      yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
+      return;
     }
-  }, 800);
 
-  /* 3️⃣ If Invidious fails → try Piped */
-  setTimeout(() => {
-    if (yf.contentWindow == null || yf.contentDocument?.body?.innerText?.includes("Error")) {
-      yf.src = "https://piped.video/embed/" + id;
-    }
-  }, 1600);
-};
+    /* 1️⃣ Try YouTube embed */
+    yf.src = "https://www.youtube.com/embed/" + id;
+
+    /* 2️⃣ Try Invidious embed */
+    setTimeout(() => {
+      if (yf.contentWindow == null) {
+        yf.src = "https://inv.nadeko.net/embed/" + id;
+      }
+    }, 800);
+
+    /* 3️⃣ Try Piped embed */
+    setTimeout(() => {
+      if (yf.contentWindow == null) {
+        yf.src = "https://piped.video/embed/" + id;
+      }
+    }, 1600);
+
+    /* 4️⃣ Try full proxied page */
+    setTimeout(() => {
+      if (yf.contentWindow == null) {
+        yf.src = "https://piped.video/watch?v=" + id;
+      }
+    }, 2400);
+
+    /* 5️⃣ Final fallback — disguised popup */
+    setTimeout(() => {
+      if (yf.contentWindow == null) {
+        const win = window.open("about:blank", "_blank");
+        if (win) {
+          win.document.title = "";
+          win.location.href = "https://piped.video/watch?v=" + id;
+        }
+      }
+    }, 3200);
+  };
 
   /* SMART BROWSER */
   d.getElementById("webBtn").onclick=()=>{
@@ -287,5 +303,3 @@ d.getElementById("ytBtn").onclick = () => {
   };
 
 })();
-
-
