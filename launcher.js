@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-/* ⭐ BROWSER — POPUP-ONLY MODE (CHROMEBOOK SAFE) ⭐ */
+/* ⭐ BROWSER — POPUP-ONLY MODE (NO PROXIES, CHROMEBOOK SAFE) ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let q = wu.value.trim();
   if (!q) return;
@@ -321,11 +321,4 @@ d.getElementById("webBtn").onclick = () => {
   wf.src = "about:blank";
 };
 
-
 })();
-
-
-
-
-
-
