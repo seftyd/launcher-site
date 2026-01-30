@@ -236,18 +236,22 @@
 
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-  /* SMART YOUTUBE */
-  d.getElementById("ytBtn").onclick=()=>{
-    const q=ys.value.trim();
-    if(!q)return;
+  /* ⭐ FIXED YOUTUBE (NO ERROR 153) ⭐ */
+  d.getElementById("ytBtn").onclick = () => {
+    const q = ys.value.trim();
+    if (!q) return;
 
-    if(q.includes("youtube.com")||q.includes("youtu.be")){
-      let id=q.split("v=")[1]||q.split("/").pop();
-      id=id.split("&")[0];
-      yf.src="https://www.youtube.com/embed/"+id;
+    let id = "";
+
+    if (q.includes("youtube.com") || q.includes("youtu.be")) {
+      id = q.split("v=")[1] || q.split("/").pop();
+      id = id.split("&")[0];
     } else {
-      yf.src="https://www.youtube.com/embed?listType=search&list="+encodeURIComponent(q);
+      yf.src = "https://inv.nadeko.net/search?q=" + encodeURIComponent(q);
+      return;
     }
+
+    yf.src = "https://inv.nadeko.net/embed/" + id;
   };
 
   /* SMART BROWSER */
