@@ -291,36 +291,37 @@
     }, 3000);
   };
 
-  /* ⭐ SMART BROWSER WITH PIPED SEARCH + INSTANT POPUP ⭐ */
-  d.getElementById("webBtn").onclick = () => {
-    let q = wu.value.trim();
-    if (!q) return;
+/* ⭐ SMART BROWSER WITH GOOGLE SEARCH + INSTANT POPUP ⭐ */
+d.getElementById("webBtn").onclick = () => {
+  let q = wu.value.trim();
+  if (!q) return;
 
-    /* Detect if input is a real URL */
-    const isURL = q.startsWith("http://") ||
-                  q.startsWith("https://") ||
-                  (q.includes(".") && !q.includes(" "));
+  /* Detect if input is a real URL */
+  const isURL = q.startsWith("http://") ||
+                q.startsWith("https://") ||
+                (q.includes(".") && !q.includes(" "));
 
-    /* If not a URL → treat as search */
-    if (!isURL) {
-      q = "https://piped.video/search?q=" + encodeURIComponent(q);
-    } else if (!q.startsWith("http")) {
-      q = "https://" + q;
+  /* If not a URL → treat as Google search */
+  if (!isURL) {
+    q = "https://www.google.com/search?q=" + encodeURIComponent(q);
+  } else if (!q.startsWith("http")) {
+    q = "https://" + q;
+  }
+
+  /* ⭐ Open blank popup IMMEDIATELY ⭐ */
+  const popup = window.open("about:blank", "_blank");
+  if (popup) popup.document.title = "";
+
+  /* Try loading inside iframe */
+  wf.src = q;
+
+  /* Also load into popup (bypasses iframe blocks) */
+  setTimeout(() => {
+    if (popup && popup.location) {
+      popup.location.href = q;
     }
-
-    /* ⭐ Open blank popup IMMEDIATELY ⭐ */
-    const popup = window.open("about:blank", "_blank");
-    if (popup) popup.document.title = "";
-
-    /* Try loading inside iframe */
-    wf.src = q;
-
-    /* If iframe is blocked → load into popup */
-    setTimeout(() => {
-      if (popup && popup.location) {
-        popup.location.href = q;
-      }
-    }, 800);
-  };
+  }, 800);
+};
 
 })();
+
