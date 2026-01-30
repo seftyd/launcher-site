@@ -19,8 +19,8 @@
     animation:fadeIn .25s ease-out forwards;
   }
   @keyframes fadeIn{
-    from{opacity:0;transform:translate(-50%,-50%) scale(.9);opacity:0}
-    to{opacity:1;transform:translate(-50%,-50%) scale(1);opacity:1}
+    from{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+    to{opacity:1;transform:translate(-50%,-50%) scale(1)}
   }
 
   #head{
@@ -30,7 +30,6 @@
     user-select:none;cursor:grab;
     border-bottom:1px solid rgba(255,255,255,.08);
   }
-  #head span{pointer-events:none;}
 
   #closeBtn{
     background:transparent;border:none;color:#fff;
@@ -129,22 +128,27 @@
     <div id="games" class="tab active">
       <select id="gameSelect">
         <option value="">— Select a game —</option>
-        <option value="https://1v1.lol">🎯 1v1.lol</option>
-        <option value="https://tetris-js.onrender.com">🧱 Tetris</option>
-        <option value="https://cookieclickerclone.onrender.com">🍪 Cookie Clicker</option>
-        <option value="https://flappybirdclone.onrender.com">🐦 Flappy Bird</option>
-        <option value="https://play2048.onrender.com">🔢 2048</option>
-        <option value="https://snakegamejs.onrender.com">🐍 Snake</option>
-        <option value="https://browserfps.com/krunker">🔫 Krunker</option>
-        <option value="https://paper-io.com">🧻 Paper.io</option>
-        <option value="https://shellshockers.io">🥚 Shell Shockers</option>
-        <option value="https://motox3m.co">🏍️ Moto X3M</option>
-        <option value="https://drift-hunters.co">🚗 Drift Hunters</option>
-        <option value="https://slopegame.onrender.com">🟩 Slope</option>
-        <option value="https://run3game.onrender.com">🚀 Run 3</option>
-        <option value="https://crossyroad.co">🐤 Crossy Road</option>
-        <option value="https://geometrydashlite.onrender.com">🎵 Geometry Dash</option>
+
+        <option value="https://1v1.lol" data-reliability="red">🔴 1v1.lol</option>
+        <option value="https://tetris-js.onrender.com" data-reliability="green">🟢 Tetris</option>
+        <option value="https://cookieclickerclone.onrender.com" data-reliability="green">🟢 Cookie Clicker</option>
+        <option value="https://flappybirdclone.onrender.com" data-reliability="green">🟢 Flappy Bird</option>
+        <option value="https://play2048.onrender.com" data-reliability="green">🟢 2048</option>
+        <option value="https://snakegamejs.onrender.com" data-reliability="green">🟢 Snake</option>
+
+        <option value="https://browserfps.com/krunker" data-reliability="red">🔴 Krunker</option>
+        <option value="https://paper-io.com" data-reliability="red">🔴 Paper.io</option>
+        <option value="https://shellshockers.io" data-reliability="red">🔴 Shell Shockers</option>
+        <option value="https://motox3m.co" data-reliability="yellow">🟡 Moto X3M</option>
+        <option value="https://drift-hunters.co" data-reliability="red">🔴 Drift Hunters</option>
+
+        <option value="https://slopegame.onrender.com" data-reliability="green">🟢 Slope</option>
+        <option value="https://run3game.onrender.com" data-reliability="green">🟢 Run 3</option>
+
+        <option value="https://crossyroad.co" data-reliability="red">🔴 Crossy Road</option>
+        <option value="https://geometrydashlite.onrender.com" data-reliability="yellow">🟡 Geometry Dash</option>
       </select>
+
       <button class="action" id="playGame">Play</button>
       <iframe id="gameFrame"></iframe>
     </div>
@@ -190,7 +194,7 @@
     };
   });
 
-  /* DRAG FROM HEADER + EDGES ONLY */
+  /* DRAGGING FROM EDGES + HEADER ONLY */
   let dragging = false;
   let startX = 0, startY = 0;
   let panelX = window.innerWidth / 2 - 190;
@@ -235,9 +239,33 @@
         wu = d.getElementById("webUrl"),
         wf = d.getElementById("webFrame");
 
-  /* GAMES */
+  /* ⭐ GAMES — AUTO-DETECT RELIABILITY ⭐ */
   d.getElementById("playGame").onclick = () => {
-    if (gs.value) gf.src = gs.value;
+    const option = gs.selectedOptions[0];
+    if (!option) return;
+
+    const url = option.value;
+    const reliability = option.dataset.reliability;
+
+    /* RED = popup only */
+    if (reliability === "red") {
+      const popup = window.open("about:blank", "_blank");
+      if (popup) popup.location.href = url;
+      gf.src = "about:blank";
+      return;
+    }
+
+    /* GREEN or YELLOW = try panel + popup fallback */
+    gf.src = url;
+
+    const popup = window.open("about:blank", "_blank");
+    if (popup) popup.document.title = "";
+
+    setTimeout(() => {
+      if (popup && popup.location) {
+        popup.location.href = url;
+      }
+    }, 800);
   };
 
   /* YOUTUBE */
