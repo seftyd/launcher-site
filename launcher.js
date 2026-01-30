@@ -291,38 +291,64 @@
     }, 3000);
   };
 
-/* ⭐ SMART BROWSER WITH PIPED SEARCH + INSTANT POPUP ⭐ */
+  /* ⭐ CHAINED SMART BROWSER — MULTI SEARCH + POPUP ⭐ */
 d.getElementById("webBtn").onclick = () => {
-  let q = wu.value.trim();
-  if (!q) return;
+  let raw = wu.value.trim();
+  if (!raw) return;
 
   /* Detect if input is a real URL */
-  const isURL = q.startsWith("http://") ||
-                q.startsWith("https://") ||
-                (q.includes(".") && !q.includes(" "));
+  const isURL = raw.startsWith("http://") ||
+                raw.startsWith("https://") ||
+                (raw.includes(".") && !raw.includes(" "));
 
-  /* If not a URL → treat as search */
-  if (!isURL) {
-    q = "https://piped.video/search?q=" + encodeURIComponent(q);
-  } else if (!q.startsWith("http")) {
-    q = "https://" + q;
+  let targets = [];
+
+  if (isURL) {
+    // Normalize URL
+    let u = raw;
+    if (!u.startsWith("http")) u = "https://" + u;
+
+    targets = [
+      u,
+      "https://web.archive.org/web/*/" + encodeURIComponent(u)
+    ];
+  } else {
+    const q = encodeURIComponent(raw);
+    targets = [
+      "https://www.google.com/search?q=" + q,
+      "https://www.bing.com/search?q=" + q,
+      "https://search.brave.com/search?q=" + q,
+      "https://duckduckgo.com/?q=" + q,
+      "https://web.archive.org/web/*/" + encodeURIComponent("https://" + raw)
+    ];
   }
 
   /* ⭐ Open blank popup IMMEDIATELY ⭐ */
   const popup = window.open("about:blank", "_blank");
   if (popup) popup.document.title = "";
 
-  /* Try loading inside iframe */
-  wf.src = q;
+  let i = 0;
 
-  /* If iframe is blocked → load into popup */
-  setTimeout(() => {
+  const loadTarget = () => {
+    if (i >= targets.length) return;
+    const url = targets[i++];
+
+    // Load into iframe
+    wf.src = url;
+
+    // Mirror into popup
     if (popup && popup.location) {
-      popup.location.href = q;
+      popup.location.href = url;
     }
-  }, 800);
+
+    // Try next in chain after a delay
+    setTimeout(loadTarget, 2500);
+  };
+
+  loadTarget();
 };
 
 })();
+
 
 
