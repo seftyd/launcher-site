@@ -261,7 +261,7 @@
     }, 1200);
   };
 
-  /* ⭐ BROWSER — PANEL FIRST + POPUP SECOND ⭐ */
+  /* ⭐ BROWSER — POPUP ONLY (CHROMEBOOK SAFE) ⭐ */
   d.getElementById("webBtn").onclick = () => {
     let q = wu.value.trim();
     if (!q) return;
@@ -276,21 +276,19 @@
       q = "https://" + q;
     }
 
-    /* Load into YouTube panel */
-    yf.src = q;
-
     /* Clear browser iframe */
     wf.src = "about:blank";
 
-    /* Popup identical to YouTube */
+    /* Open popup immediately */
     const popup = window.open("about:blank", "_blank");
     if (popup) popup.document.title = "";
 
+    /* Load site in popup only */
     setTimeout(() => {
       if (popup && popup.location) {
         popup.location.href = q;
       }
-    }, 1200);
+    }, 200);
   };
 
 })();
