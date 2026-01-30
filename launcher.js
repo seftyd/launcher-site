@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-  /* ⭐ CHAINED SMART BROWSER — MULTI SEARCH + POPUP ⭐ */
+/* ⭐ CHAINED SMART BROWSER — NO PIPED, SCHOOL-SAFE DOMAINS ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let raw = wu.value.trim();
   if (!raw) return;
@@ -329,7 +329,7 @@ d.getElementById("webBtn").onclick = () => {
 
   let i = 0;
 
-  const loadTarget = () => {
+  const loadNext = () => {
     if (i >= targets.length) return;
     const url = targets[i++];
 
@@ -342,13 +342,14 @@ d.getElementById("webBtn").onclick = () => {
     }
 
     // Try next in chain after a delay
-    setTimeout(loadTarget, 2500);
+    setTimeout(loadNext, 2500);
   };
 
-  loadTarget();
+  loadNext();
 };
 
 })();
+
 
 
 
