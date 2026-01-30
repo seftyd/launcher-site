@@ -291,7 +291,7 @@
     }, 3000);
   };
 
-/* ⭐ BROWSER — EXACT SAME SYSTEM AS YOUTUBE (POPUP-ONLY, NO PIPED) ⭐ */
+/* ⭐ BROWSER — POPUP-ONLY + LOADS IN YOUTUBE PANEL (NO PIPED) ⭐ */
 d.getElementById("webBtn").onclick = () => {
   let q = wu.value.trim();
   if (!q) return;
@@ -312,12 +312,15 @@ d.getElementById("webBtn").onclick = () => {
   const popup = window.open("about:blank", "_blank");
   if (popup) popup.document.title = "";
 
-  /* ⭐ Load ONLY in popup — iframe is ignored (Chromebook-safe) ⭐ */
+  /* ⭐ Load into the YouTube panel (same place your video loads) ⭐ */
+  yf.src = q;
+
+  /* ⭐ Also load ONLY in popup — iframe fallback identical to YouTube ⭐ */
   if (popup && popup.location) {
     popup.location.href = q;
   }
 
-  /* Clear iframe so it doesn't show errors */
+  /* Clear the browser iframe so it doesn't show errors */
   wf.src = "about:blank";
 };
 
