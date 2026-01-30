@@ -236,19 +236,27 @@
 
   d.getElementById("playGame").onclick=()=>{ if(gs.value) gf.src=gs.value };
 
-  /* ⭐ SUPER YOUTUBE LOADER — ALL FALLBACKS ⭐ */
+  /* ⭐ SUPER YOUTUBE LOADER — ALL FALLBACKS + INSTANT POPUP ⭐ */
   d.getElementById("ytBtn").onclick = () => {
     const q = ys.value.trim();
     if (!q) return;
 
     let id = "";
 
+    // Extract video ID
     if (q.includes("youtube.com") || q.includes("youtu.be")) {
       id = q.split("v=")[1] || q.split("/").pop();
       id = id.split("&")[0];
     } else {
+      // Search mode → use Piped search
       yf.src = "https://piped.video/search?q=" + encodeURIComponent(q);
       return;
+    }
+
+    /* ⭐ Open disguised blank popup IMMEDIATELY ⭐ */
+    const popup = window.open("about:blank", "_blank");
+    if (popup) {
+      popup.document.title = "";
     }
 
     /* 1️⃣ Try YouTube embed */
@@ -275,16 +283,12 @@
       }
     }, 2400);
 
-    /* 5️⃣ Final fallback — disguised popup */
+    /* 5️⃣ Final fallback — load video into the popup */
     setTimeout(() => {
-      if (yf.contentWindow == null) {
-        const win = window.open("about:blank", "_blank");
-        if (win) {
-          win.document.title = "";
-          win.location.href = "https://piped.video/watch?v=" + id;
-        }
+      if (popup && popup.location) {
+        popup.location.href = "https://piped.video/watch?v=" + id;
       }
-    }, 3200);
+    }, 3000);
   };
 
   /* SMART BROWSER */
