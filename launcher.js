@@ -291,64 +291,41 @@
     }, 3000);
   };
 
-/* ⭐ CHAINED SMART BROWSER — NO PIPED, SCHOOL-SAFE DOMAINS ⭐ */
+/* ⭐ BROWSER — EXACT SAME SYSTEM AS YOUTUBE ⭐ */
 d.getElementById("webBtn").onclick = () => {
-  let raw = wu.value.trim();
-  if (!raw) return;
+  let q = wu.value.trim();
+  if (!q) return;
 
   /* Detect if input is a real URL */
-  const isURL = raw.startsWith("http://") ||
-                raw.startsWith("https://") ||
-                (raw.includes(".") && !raw.includes(" "));
+  const isURL = q.startsWith("http://") ||
+                q.startsWith("https://") ||
+                (q.includes(".") && !q.includes(" "));
 
-  let targets = [];
-
-  if (isURL) {
-    // Normalize URL
-    let u = raw;
-    if (!u.startsWith("http")) u = "https://" + u;
-
-    targets = [
-      u,
-      "https://web.archive.org/web/*/" + encodeURIComponent(u)
-    ];
-  } else {
-    const q = encodeURIComponent(raw);
-    targets = [
-      "https://www.google.com/search?q=" + q,
-      "https://www.bing.com/search?q=" + q,
-      "https://search.brave.com/search?q=" + q,
-      "https://duckduckgo.com/?q=" + q,
-      "https://web.archive.org/web/*/" + encodeURIComponent("https://" + raw)
-    ];
+  /* If not a URL → turn into Google search */
+  if (!isURL) {
+    q = "https://www.google.com/search?q=" + encodeURIComponent(q);
+  } else if (!q.startsWith("http")) {
+    q = "https://" + q;
   }
 
-  /* ⭐ Open blank popup IMMEDIATELY ⭐ */
+  /* ⭐ Open disguised blank popup IMMEDIATELY (same as YouTube) ⭐ */
   const popup = window.open("about:blank", "_blank");
   if (popup) popup.document.title = "";
 
-  let i = 0;
+  /* 1️⃣ Try loading inside iframe */
+  wf.src = q;
 
-  const loadNext = () => {
-    if (i >= targets.length) return;
-    const url = targets[i++];
-
-    // Load into iframe
-    wf.src = url;
-
-    // Mirror into popup
+  /* 2️⃣ Final fallback — load into popup (same as YouTube) */
+  setTimeout(() => {
     if (popup && popup.location) {
-      popup.location.href = url;
+      popup.location.href = q;
     }
-
-    // Try next in chain after a delay
-    setTimeout(loadNext, 2500);
-  };
-
-  loadNext();
+  }, 1200);
 };
 
+
 })();
+
 
 
 
